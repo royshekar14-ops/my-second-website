@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -48,7 +48,6 @@ body{
     border:5px solid #8b4513;
     border-radius:25px;
     background:linear-gradient(#f4c27a,#d99a4e);
-    position:relative;
     overflow:hidden;
     box-shadow:0 8px 20px rgba(0,0,0,.25);
 }
@@ -72,24 +71,12 @@ body{
     border-radius:20px;
     padding:12px;
     text-align:center;
-    width:140px;
+    width:130px;
     box-shadow:0 5px 12px rgba(0,0,0,.2);
 }
 
 .duck-img{
-    width:100%;
-    height:110px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    margin-bottom:8px;
-}
-
-.duck-img img{
-    width:100%;
-    height:110px;
-    object-fit:cover;
-    border-radius:15px;
+    font-size:65px;
 }
 
 .level{
@@ -132,7 +119,7 @@ button:active{
 
 .collection{
     display:grid;
-    grid-template-columns:repeat(2,1fr);
+    grid-template-columns:repeat(3,1fr);
     gap:10px;
 }
 
@@ -143,12 +130,8 @@ button:active{
     text-align:center;
 }
 
-.card img{
-    width:100%;
-    height:120px;
-    object-fit:cover;
-    border-radius:12px;
-    margin-bottom:5px;
+.card .emoji{
+    font-size:45px;
 }
 
 .common{
@@ -177,3 +160,747 @@ button:active{
     font-weight:bold;
     margin:15px;
 }
+
+.hidden{
+    display:none;
+}
+
+#message{
+    position:fixed;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#222;
+    color:white;
+    padding:15px 20px;
+    border-radius:15px;
+    display:none;
+    z-index:100;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+
+    <div class="resource">
+        🪙 <span id="coins">100</span>
+    </div>
+
+    <div class="resource">
+        🍞 <span id="food">50</span>
+    </div>
+
+    <div class="resource">
+        🟢 <span id="commonToken">0</span>
+    </div>
+
+    <div class="resource">
+        🔵 <span id="uncommonToken">0</span>
+    </div>
+
+</div>
+
+
+<div class="game">
+
+    <div class="house">
+
+        <h1>🏠 Duck House</h1>
+
+        <div id="ducks" class="ducks"></div>
+
+    </div>
+
+
+    <div class="buttons">
+
+        <button onclick="feedDuck()">
+            🍞 Feed Duck
+        </button>
+
+        <button onclick="startBreeding()">
+            🧬 Breeding
+        </button>
+
+        <button onclick="openCollection()">
+            📚 Collection
+        </button>
+
+        <button onclick="openTokens()">
+            🪙 Tokens
+        </button>
+
+    </div>
+
+
+    <div id="breedingPanel" class="panel hidden">
+
+        <h2>🧬 Duck Breeding</h2>
+
+        <p>
+            Duck is preparing for breeding...
+        </p>
+
+        <div id="timer" class="timer">
+            04:00:00
+        </div>
+
+    </div>
+
+
+    <div id="collectionPanel" class="panel hidden">
+
+        <h2>📚 Duck Collection</h2>
+
+        <div id="collection" class="collection"></div>
+
+    </div>
+
+
+    <div id="tokenPanel" class="panel hidden">
+
+        <h2>🪙 Token Shop</h2>
+
+        <p>
+            🟢 Common Token:
+            <span id="shopCommon">0</span>
+        </p>
+
+        <button onclick="useCommonToken()">
+            Use Common Token
+        </button>
+
+        <br><br>
+
+        <p>
+            🔵 Uncommon Token:
+            <span id="shopUncommon">0</span>
+        </p>
+
+        <button onclick="useUncommonToken()">
+            Use Uncommon Token
+        </button>
+
+    </div>
+
+</div>
+
+
+<div id="message"></div>
+
+
+<script>
+
+let coins = 100;
+let food = 50;
+
+let commonToken = 0;
+let uncommonToken = 0;
+
+
+/* DUCK DATA */
+
+let ducks = [
+
+    {
+        id:1,
+        name:"Duck 1",
+        rarity:"Common",
+        level:1,
+        progress:0
+    }
+
+];
+
+
+/* RARITY */
+
+const rarityEmoji = {
+
+    Common:"🟢",
+    Uncommon:"🔵",
+    Rare:"🟣",
+    Epic:"🟠",
+    Legendary:"🔴"
+
+};
+
+
+/* DUCK COLLECTION */
+
+const duckCollection = {
+
+    Common:[
+        "🦆",
+        "🐤",
+        "🐥",
+        "🦆",
+        "🐤",
+        "🐥",
+        "🦆"
+    ],
+
+    Uncommon:[
+        "🦆",
+        "🐤",
+        "🐥"
+    ],
+
+    Rare:[
+        "🦆",
+        "🐤"
+    ],
+
+    Epic:[
+        "🦆",
+        "🐤"
+    ],
+
+    Legendary:[
+        "🦆"
+    ]
+
+};
+
+
+/* UPDATE */
+
+function updateResources(){
+
+    document.getElementById("coins").textContent = coins;
+
+    document.getElementById("food").textContent = food;
+
+    document.getElementById("commonToken").textContent =
+        commonToken;
+
+    document.getElementById("uncommonToken").textContent =
+        uncommonToken;
+
+    document.getElementById("shopCommon").textContent =
+        commonToken;
+
+    document.getElementById("shopUncommon").textContent =
+        uncommonToken;
+
+}
+
+
+/* MESSAGE */
+
+function showMessage(text){
+
+    const msg =
+        document.getElementById("message");
+
+    msg.textContent = text;
+
+    msg.style.display = "block";
+
+    setTimeout(()=>{
+
+        msg.style.display = "none";
+
+    },2500);
+
+}
+
+
+/* DISPLAY DUCKS */
+
+function displayDucks(){
+
+    const container =
+        document.getElementById("ducks");
+
+    container.innerHTML = "";
+
+    ducks.forEach((duck,index)=>{
+
+        container.innerHTML += `
+
+        <div class="duck">
+
+            <div class="duck-img">
+                🦆
+            </div>
+
+            <b>${duck.name}</b>
+
+            <div>
+                ${rarityEmoji[duck.rarity]}
+                ${duck.rarity}
+            </div>
+
+            <div class="level">
+                ⭐ Level ${duck.level}
+            </div>
+
+            <div>
+                Progress:
+                ${duck.progress}/100
+            </div>
+
+            <br>
+
+            <button onclick="sellDuck(${index})">
+                🍞 Sell
+            </button>
+
+        </div>
+
+        `;
+
+    });
+
+}
+
+
+/* FEED */
+
+function feedDuck(){
+
+    if(food <= 0){
+
+        showMessage("🍞 Food নেই!");
+
+        return;
+
+    }
+
+    food--;
+
+    ducks[0].progress += 20;
+
+    if(ducks[0].progress >= 100){
+
+        ducks[0].progress = 0;
+
+        ducks[0].level++;
+
+        showMessage(
+            "🎉 Duck Level Up! Level " +
+            ducks[0].level
+        );
+
+    }
+
+    updateResources();
+
+    displayDucks();
+
+}
+
+
+/* BREEDING */
+
+let breeding = false;
+let breedingEndTime = 0;
+
+
+function startBreeding(){
+
+    if(breeding){
+
+        showMessage("🧬 Already breeding!");
+
+        return;
+
+    }
+
+    if(ducks.length === 0){
+
+        showMessage("কোনো হাঁস নেই!");
+
+        return;
+
+    }
+
+    breeding = true;
+
+    breedingEndTime =
+        Date.now() + 60 * 1000;
+
+    document
+        .getElementById("breedingPanel")
+        .classList
+        .remove("hidden");
+
+    updateTimer();
+
+}
+
+
+/* TIMER */
+
+function updateTimer(){
+
+    if(!breeding) return;
+
+    let remaining =
+        breedingEndTime - Date.now();
+
+    if(remaining <= 0){
+
+        breeding = false;
+
+        document
+            .getElementById("timer")
+            .textContent = "00:00:00";
+
+        finishBreeding();
+
+        return;
+
+    }
+
+    let totalSeconds =
+        Math.floor(remaining / 1000);
+
+    let hours =
+        Math.floor(totalSeconds / 3600);
+
+    let minutes =
+        Math.floor(
+            (totalSeconds % 3600) / 60
+        );
+
+    let seconds =
+        totalSeconds % 60;
+
+    document
+        .getElementById("timer")
+        .textContent =
+
+        String(hours).padStart(2,"0")
+        + ":" +
+
+        String(minutes).padStart(2,"0")
+        + ":" +
+
+        String(seconds).padStart(2,"0");
+
+    setTimeout(updateTimer,1000);
+
+}
+
+
+/* RANDOM RARITY */
+
+function randomRarity(current){
+
+    let random = Math.random() * 100;
+
+    if(current === "Common"){
+
+        if(random < 80)
+            return "Common";
+
+        return "Uncommon";
+
+    }
+
+    if(current === "Uncommon"){
+
+        if(random < 50)
+            return "Common";
+
+        if(random < 90)
+            return "Uncommon";
+
+        return "Rare";
+
+    }
+
+    if(current === "Rare"){
+
+        if(random < 20)
+            return "Common";
+
+        if(random < 60)
+            return "Uncommon";
+
+        if(random < 95)
+            return "Rare";
+
+        return "Epic";
+
+    }
+
+    if(current === "Epic"){
+
+        if(random < 10)
+            return "Uncommon";
+
+        if(random < 40)
+            return "Rare";
+
+        if(random < 90)
+            return "Epic";
+
+        return "Legendary";
+
+    }
+
+    return "Legendary";
+
+}
+
+
+/* FINISH BREEDING */
+
+function finishBreeding(){
+
+    const parent =
+        ducks[
+            Math.floor(
+                Math.random() * ducks.length
+            )
+        ];
+
+    const newRarity =
+        randomRarity(parent.rarity);
+
+    ducks.push({
+
+        id:Date.now(),
+
+        name:
+            newRarity +
+            " Duck " +
+            Math.floor(Math.random()*999),
+
+        rarity:newRarity,
+
+        level:1,
+
+        progress:0
+
+    });
+
+
+    if(newRarity === "Common"){
+        commonToken++;
+    }
+
+    if(newRarity === "Uncommon"){
+        uncommonToken++;
+    }
+
+
+    food +=
+        Math.floor(Math.random()*20) + 10;
+
+
+    updateResources();
+
+    displayDucks();
+
+    showMessage(
+        "🎉 New " +
+        newRarity +
+        " Duck! 🦆"
+    );
+
+}
+
+
+/* SELL */
+
+function sellDuck(index){
+
+    if(ducks.length <= 1){
+
+        showMessage(
+            "কমপক্ষে ১টা হাঁস রাখতে হবে!"
+        );
+
+        return;
+
+    }
+
+    const duck = ducks[index];
+
+    let foodReward = 10;
+
+    if(duck.rarity === "Uncommon")
+        foodReward = 25;
+
+    if(duck.rarity === "Rare")
+        foodReward = 50;
+
+    if(duck.rarity === "Epic")
+        foodReward = 100;
+
+    if(duck.rarity === "Legendary")
+        foodReward = 250;
+
+    food += foodReward;
+
+    ducks.splice(index,1);
+
+    updateResources();
+
+    displayDucks();
+
+    showMessage(
+        "🦆 Duck sold! +" +
+        foodReward +
+        " 🍞 Food"
+    );
+
+}
+
+
+/* COLLECTION */
+
+function openCollection(){
+
+    document
+        .getElementById("collectionPanel")
+        .classList
+        .toggle("hidden");
+
+    const container =
+        document.getElementById("collection");
+
+    container.innerHTML = "";
+
+    Object.keys(duckCollection)
+    .forEach(rarity=>{
+
+        duckCollection[rarity]
+        .forEach((duck,index)=>{
+
+            container.innerHTML += `
+
+            <div class="card ${rarity.toLowerCase()}">
+
+                <div class="emoji">
+                    ${duck}
+                </div>
+
+                <b>${rarity}</b>
+
+                <br>
+
+                Duck ${index+1}
+
+            </div>
+
+            `;
+
+        });
+
+    });
+
+}
+
+
+/* TOKENS */
+
+function openTokens(){
+
+    document
+        .getElementById("tokenPanel")
+        .classList
+        .toggle("hidden");
+
+}
+
+
+/* COMMON TOKEN */
+
+function useCommonToken(){
+
+    if(commonToken <= 0){
+
+        showMessage(
+            "🟢 Common Token নেই!"
+        );
+
+        return;
+
+    }
+
+    commonToken--;
+
+    ducks.push({
+
+        id:Date.now(),
+
+        name:"Common Duck",
+
+        rarity:"Common",
+
+        level:1,
+
+        progress:0
+
+    });
+
+    updateResources();
+
+    displayDucks();
+
+    showMessage(
+        "🪙 Common Token Used! 🦆"
+    );
+
+}
+
+
+/* UNCOMMON TOKEN */
+
+function useUncommonToken(){
+
+    if(uncommonToken <= 0){
+
+        showMessage(
+            "🔵 Uncommon Token নেই!"
+        );
+
+        return;
+
+    }
+
+    uncommonToken--;
+
+    ducks.push({
+
+        id:Date.now(),
+
+        name:"Uncommon Duck",
+
+        rarity:"Uncommon",
+
+        level:1,
+
+        progress:0
+
+    });
+
+    updateResources();
+
+    displayDucks();
+
+    showMessage(
+        "🪙 Uncommon Token Used! 🦆"
+    );
+
+}
+
+
+/* START */
+
+updateResources();
+
+displayDucks();
+
+</script>
+
+</body>
+</html>
