@@ -1,20 +1,18 @@
-<!-- common.b -->
-
 <div class="image-container">
 
-  <img src="1.jpg" alt="ছবি ১">
+  <img src="Gemini_Generated_Image_9cbtb9cbtb9cbtb9.jpeg" alt="ছবি ১">
 
-  <img src="2.jpg" alt="ছবি ২">
+  <img src="IMG_20260823_142546.jpg" alt="ছবি ২">
 
-  <img src="3.jpg" alt="ছবি ৩">
+  <img src="IMG_20260823_142608.jpg" alt="ছবি ৩">
 
-  <img src="4.jpg" alt="ছবি ৪">
+  <img src="IMG_20260823_142648.jpg" alt="ছবি ৪">
 
-  <img src="5.jpg" alt="ছবি ৫">
+  <img src="IMG_20260823_142451.jpg" alt="ছবি ৫">
 
-  <img src="6.jpg" alt="ছবি ৬">
+  <img src="IMG_20260823_142432.jpg" alt="ছবি ৬">
 
-  <img src="7.jpg" alt="ছবি ৭">
+  <img src="IMG_20260823_142132.jpg" alt="ছবি ৭">
 
 </div>
 
