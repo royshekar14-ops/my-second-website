@@ -1,1 +1,631 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>🦆 My Duck Farm</title>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:linear-gradient(#87ceeb,#dff6ff);
+    min-height:100vh;
+}
+
+header{
+    background:#2e7d32;
+    color:white;
+    text-align:center;
+    padding:15px;
+    box-shadow:0 3px 10px rgba(0,0,0,.3);
+}
+
+header h1{
+    margin:0;
+}
+
+.stats{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:10px;
+    padding:15px;
+}
+
+.stat{
+    background:white;
+    padding:12px 18px;
+    border-radius:15px;
+    min-width:130px;
+    text-align:center;
+    font-weight:bold;
+    box-shadow:0 4px 10px rgba(0,0,0,.15);
+}
+
+.game{
+    max-width:1000px;
+    margin:auto;
+    padding:15px;
+}
+
+.farm{
+    background:linear-gradient(#8bc34a,#4caf50);
+    border:5px solid #2e7d32;
+    border-radius:20px;
+    min-height:350px;
+    padding:20px;
+    position:relative;
+    overflow:hidden;
+}
+
+.farm-title{
+    text-align:center;
+    font-size:25px;
+    font-weight:bold;
+    color:white;
+    text-shadow:2px 2px 3px black;
+}
+
+.ducks{
+    display:flex;
+    flex-wrap:wrap;
+    gap:15px;
+    justify-content:center;
+    margin-top:30px;
+}
+
+.duck{
+    width:120px;
+    background:white;
+    border-radius:20px;
+    padding:10px;
+    text-align:center;
+    box-shadow:0 4px 10px rgba(0,0,0,.3);
+    animation:move 2s infinite alternate ease-in-out;
+}
+
+@keyframes move{
+    from{transform:translateY(0);}
+    to{transform:translateY(-8px);}
+}
+
+.duck-icon{
+    font-size:50px;
+}
+
+.bar{
+    width:100%;
+    height:12px;
+    background:#ddd;
+    border-radius:10px;
+    overflow:hidden;
+    margin:5px 0;
+}
+
+.bar-fill{
+    height:100%;
+    background:#4caf50;
+    width:100%;
+}
+
+.controls{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:15px;
+    margin-top:20px;
+}
+
+.card{
+    background:white;
+    border-radius:18px;
+    padding:15px;
+    text-align:center;
+    box-shadow:0 4px 12px rgba(0,0,0,.2);
+}
+
+button{
+    border:none;
+    padding:12px;
+    border-radius:12px;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+    width:100%;
+    margin-top:8px;
+    transition:.2s;
+}
+
+button:hover{
+    transform:scale(1.03);
+}
+
+.buy{
+    background:#2196f3;
+    color:white;
+}
+
+.food{
+    background:#ff9800;
+    color:white;
+}
+
+.sell{
+    background:#4caf50;
+    color:white;
+}
+
+.reset{
+    background:#f44336;
+    color:white;
+}
+
+.message{
+    margin-top:15px;
+    text-align:center;
+    font-weight:bold;
+    background:white;
+    padding:12px;
+    border-radius:12px;
+}
+
+.shop-info{
+    color:#555;
+    font-size:14px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🦆 আমার হাঁসের ফার্ম</h1>
+    <p>Build • Feed • Collect • Sell!</p>
+</header>
+
+<div class="stats">
+
+    <div class="stat">
+        💰 টাকা<br>
+        <span id="money">100</span>
+    </div>
+
+    <div class="stat">
+        🦆 হাঁস<br>
+        <span id="duckCount">0</span>
+    </div>
+
+    <div class="stat">
+        🥚 ডিম<br>
+        <span id="eggs">0</span>
+    </div>
+
+    <div class="stat">
+        🌾 খাবার<br>
+        <span id="foodCount">10</span>
+    </div>
+
+    <div class="stat">
+        ⭐ Level<br>
+        <span id="level">1</span>
+    </div>
+
+    <div class="stat">
+        ✨ XP<br>
+        <span id="xp">0</span>/100
+    </div>
+
+</div>
+
+<div class="game">
+
+<div class="farm">
+
+<div class="farm-title">
+🌳 DUCK FARM 🌳
+</div>
+
+<div class="ducks" id="ducks"></div>
+
+</div>
+
+
+<div class="controls">
+
+<div class="card">
+<h2>🦆 হাঁসের দোকান</h2>
+
+<p class="shop-info">
+১টা হাঁস = 💰 50 টাকা
+</p>
+
+<button class="buy" onclick="buyDuck()">
+🦆 হাঁস কিনুন
+</button>
+</div>
+
+
+<div class="card">
+<h2>🌾 খাবার</h2>
+
+<p class="shop-info">
+10 খাবার = 💰 20 টাকা
+</p>
+
+<button class="food" onclick="buyFood()">
+🌾 খাবার কিনুন
+</button>
+
+<button class="food" onclick="feedDucks()">
+🍽️ হাঁসকে খাবার দিন
+</button>
+</div>
+
+
+<div class="card">
+<h2>🥚 ডিম বিক্রি</h2>
+
+<p class="shop-info">
+১টা ডিম = 💰 10 টাকা
+</p>
+
+<button class="sell" onclick="sellEggs()">
+💰 সব ডিম বিক্রি করুন
+</button>
+</div>
+
+
+<div class="card">
+<h2>⚙️ গেম</h2>
+
+<button class="reset" onclick="resetGame()">
+🔄 গেম Reset
+</button>
+</div>
+
+</div>
+
+
+<div class="message" id="message">
+🦆 আপনার ফার্ম শুরু করুন!
+</div>
+
+</div>
+
+
+<script>
+
+let game = {
+    money:100,
+    ducks:0,
+    eggs:0,
+    food:10,
+    level:1,
+    xp:0,
+    duckHealth:[]
+};
+
+
+// পুরনো Save Load
+function loadGame(){
+
+    let saved = localStorage.getItem("duckFarmGame");
+
+    if(saved){
+        game = JSON.parse(saved);
+
+        if(!game.duckHealth){
+            game.duckHealth=[];
+        }
+    }
+}
+
+
+// Save Game
+function saveGame(){
+
+    localStorage.setItem(
+        "duckFarmGame",
+        JSON.stringify(game)
+    );
+
+}
+
+
+// Message
+function showMessage(text){
+
+    document.getElementById("message").innerText=text;
+
+}
+
+
+// হাঁস কিনুন
+function buyDuck(){
+
+    let price = 50;
+
+    if(game.money < price){
+
+        showMessage("❌ আপনার কাছে যথেষ্ট টাকা নেই!");
+
+        return;
+    }
+
+    game.money -= price;
+
+    game.ducks++;
+
+    game.duckHealth.push(100);
+
+    addXP(10);
+
+    showMessage("🎉 নতুন হাঁস কিনেছেন!");
+
+    updateGame();
+}
+
+
+// খাবার কিনুন
+function buyFood(){
+
+    let price=20;
+
+    if(game.money < price){
+
+        showMessage("❌ টাকা নেই!");
+
+        return;
+    }
+
+    game.money -= price;
+
+    game.food += 10;
+
+    showMessage("🌾 10 খাবার কিনেছেন!");
+
+    updateGame();
+}
+
+
+// হাঁসকে খাবার দেওয়া
+function feedDucks(){
+
+    if(game.ducks===0){
+
+        showMessage("🦆 আগে হাঁস কিনুন!");
+
+        return;
+    }
+
+    if(game.food===0){
+
+        showMessage("🌾 খাবার নেই!");
+
+        return;
+    }
+
+    let needed=game.ducks;
+
+    let fed=Math.min(needed,game.food);
+
+    game.food-=fed;
+
+    for(let i=0;i<fed;i++){
+
+        game.duckHealth[i]=Math.min(
+            100,
+            game.duckHealth[i]+30
+        );
+    }
+
+    addXP(5);
+
+    showMessage("🍽️ হাঁসগুলো খাবার পেয়েছে!");
+
+    updateGame();
+}
+
+
+// ডিম বিক্রি
+function sellEggs(){
+
+    if(game.eggs<=0){
+
+        showMessage("🥚 বিক্রি করার ডিম নেই!");
+
+        return;
+    }
+
+    let earned=game.eggs*10;
+
+    game.money+=earned;
+
+    game.eggs=0;
+
+    addXP(10);
+
+    showMessage(
+        "💰 আপনি "+earned+" টাকা আয় করেছেন!"
+    );
+
+    updateGame();
+}
+
+
+// XP
+function addXP(amount){
+
+    game.xp+=amount;
+
+    while(game.xp>=100){
+
+        game.xp-=100;
+
+        game.level++;
+
+        showMessage(
+            "🎉 LEVEL UP! এখন Level "+game.level
+        );
+    }
+}
+
+
+// ডিম উৎপাদন
+function produceEggs(){
+
+    if(game.ducks===0) return;
+
+    let produced=0;
+
+    for(let i=0;i<game.ducks;i++){
+
+        // Health কমে
+        game.duckHealth[i]-=5;
+
+        if(game.duckHealth[i]<0){
+            game.duckHealth[i]=0;
+        }
+
+        // Health 30 এর বেশি হলে ডিম
+        if(game.duckHealth[i]>=30){
+
+            if(Math.random()<0.7){
+
+                produced++;
+
+            }
+
+        }
+
+    }
+
+    if(produced>0){
+
+        game.eggs+=produced;
+
+        showMessage(
+            "🥚 আপনার হাঁস "+produced+
+            " টি নতুন ডিম দিয়েছে!"
+        );
+
+        addXP(produced*2);
+    }
+
+    updateGame();
+}
+
+
+// হাঁস দেখানো
+function renderDucks(){
+
+    let container=
+        document.getElementById("ducks");
+
+    container.innerHTML="";
+
+    for(let i=0;i<game.ducks;i++){
+
+        let health=game.duckHealth[i];
+
+        let duck=document.createElement("div");
+
+        duck.className="duck";
+
+        duck.innerHTML=`
+
+            <div class="duck-icon">🦆</div>
+
+            <b>হাঁস ${i+1}</b>
+
+            <div>❤️ ${health}%</div>
+
+            <div class="bar">
+
+                <div class="bar-fill"
+                style="width:${health}%">
+
+                </div>
+
+            </div>
+
+        `;
+
+        container.appendChild(duck);
+    }
+
+}
+
+
+// সব Update
+function updateGame(){
+
+    document.getElementById("money")
+        .innerText=game.money;
+
+    document.getElementById("duckCount")
+        .innerText=game.ducks;
+
+    document.getElementById("eggs")
+        .innerText=game.eggs;
+
+    document.getElementById("foodCount")
+        .innerText=game.food;
+
+    document.getElementById("level")
+        .innerText=game.level;
+
+    document.getElementById("xp")
+        .innerText=game.xp;
+
+    renderDucks();
+
+    saveGame();
+}
+
+
+// Reset
+function resetGame(){
+
+    let confirmReset=confirm(
+        "আপনি কি সত্যিই সব Progress মুছে ফেলতে চান?"
+    );
+
+    if(!confirmReset) return;
+
+    localStorage.removeItem("duckFarmGame");
+
+    game={
+        money:100,
+        ducks:0,
+        eggs:0,
+        food:10,
+        level:1,
+        xp:0,
+        duckHealth:[]
+    };
+
+    showMessage("🔄 নতুন Farm শুরু হয়েছে!");
+
+    updateGame();
+}
+
+
+// প্রতি 10 সেকেন্ডে ডিম
+setInterval(produceEggs,10000);
+
+
+// শুরু
+loadGame();
+
+updateGame();
+
+</script>
+
+</body>
+</html>
