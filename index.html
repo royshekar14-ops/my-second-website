@@ -1,19 +1,75 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>SAARC Checker</title>
-</head>
-
 <body>
 
-<h1>SAARC Country Checker</h1>
+<canvas id="canvas"></canvas>
 
-<form method="POST">
-    <input name="country" placeholder="Enter a country">
-    <button type="submit">Check</button>
-</form>
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 
-<h2>{{ message }}</h2>
+canvas.width = 600;
+canvas.height = 500;
+
+const hearts = [];
+
+function createHeart() {
+    hearts.push({
+        x: Math.random() * canvas.width,
+        y: canvas.height + 20,
+        size: 8 + Math.random() * 12,
+        speed: 1 + Math.random() * 2,
+        angle: Math.random() * Math.PI * 2
+    });
+}
+
+function drawHeart(x, y, size) {
+    ctx.beginPath();
+
+    ctx.moveTo(x, y + size / 4);
+
+    ctx.bezierCurveTo(
+        x - size,
+        y - size / 2,
+        x - size,
+        y + size / 2,
+        x,
+        y + size
+    );
+
+    ctx.bezierCurveTo(
+        x + size,
+        y + size / 2,
+        x + size,
+        y - size / 2,
+        x,
+        y + size / 4
+    );
+
+    ctx.fillStyle = "pink";
+    ctx.fill();
+}
+
+function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    for (let i = 0; i < hearts.length; i++) {
+        const h = hearts[i];
+
+        h.y -= h.speed;
+        h.x += Math.sin(h.angle) * 0.5;
+        h.angle += 0.02;
+
+        drawHeart(h.x, h.y, h.size);
+    }
+
+    requestAnimationFrame(animate);
+}
+
+setInterval(createHeart, 100);
+
+animate();
+</script>
 
 </body>
 </html>
